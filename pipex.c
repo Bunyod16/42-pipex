@@ -3,43 +3,80 @@
 #include <sys/wait.h>
 #include "pipex.h"
 
-void child_call(int ac, char **ag, char **ep, int fd[2])
+// void		free_pp(char **str)
+// {
+// 	free(str);
+// }
+
+static void child_call(int fd1, char **ag, char **envp, int fd[2], char **path)
 {
-	char *argv[2] = {"-la", NULL};
-	close(fd[0]);
+	const char **argv = (const char **) ft_split(ag[2], ' ');
+	int i;
+	int ffd;
+
 	dup2(fd[1], 1);
+	dup2(fd1, 0);
+	close(fd[0]);
 	close(fd[1]);
-	execve("/usr/bin/ls", argv, ep);
+	i = 0;
+	while (path[i]);
+	{
+		execve(path[i], (char **) argv, envp);
+		i++;
+	}
 }
 
-void parent_call(int ac, char **ag, char **ep, int fd[2])
+static void parent_call(int fd2, char **ag, char **ep, int fd[2])
 {
 	char *buf;
 
-	printf("%ld", read(fd[0], buf, 10));
-	printf("%s", buf);
+	close(fd[1]);
+	read(fd[0], &buf, 10);
+	close(fd[0]);
+	write(fd2, "hello", 6);
 }
 
-int main(int ac, char **ag, char **ep)
+int pipex(int fd1, int fd2, char **argv, char **envp)
 {
 	pid_t	pid;
-	int		fd[2];
-	int		*status;
+	int		pipe_end[2];
+	int		i;
+	char	**path;
 
-	if (ac != 5)
-	{
-		ft_putstr_fd("Error: Need exactly 5 arguements!\n", 1);
-		return (0);
-	}
-	pipe(fd);
+	i = 0;
+	while(!ft_strnstr(envp[i] ,"PATH", 4))
+		i++;
+	path = process_path(envp[i], argv);
+	pipe(pipe_end);
 	pid = fork();
-	if (pid == 0)
-    	child_call(ac, ag, ep, fd);
-	else
+	close(pipe_end[1]);
+	close(pipe_end[0]);
+	if (pid == -1)
+		perror("Could not fork");
+	else if (pid == 0)
+    	child_call(fd1, argv, envp, pipe_end, path);
+	else if (pid > 0)
+		parent_call(fd2, argv ,envp, pipe_end);
+	i = 0;
+	while (path[i] && *path[i])
 	{
-		waitpid(-1, NULL, 0);
-		parent_call(ac, ag ,ep, fd);
+		printf("%s\n", path[i]);
+		i++;
 	}
-	close(fd[0]);
-	close(fd[1]);
+}
+
+int main(int argc, char **argv, char **envp)
+{
+    const int fd1 = open(argv[1], O_RDONLY);
+    const int fd2 = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, S_IRWXU);
+    
+	if (argc != 5)
+	{
+		ft_putstr_fd("Need exactly 5 arguements!", 1);
+		return (-1);
+	}
+	if (fd1 < 0 || fd2 < 0)
+         return (-1);
+    pipex(fd1, fd2, argv, envp);
+    return (0);
 }
