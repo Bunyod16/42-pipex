@@ -65,28 +65,44 @@ char *find_cmd(char *str)
 		ret[i] = str[i];
 		i++;
 	}
-	ret[i] = '\0';
+	ret[i] = 0;
 	return (ret);
+}
+
+char **assign_array(char **str)
+{
+	int i;
+	char **ret;
+
+	i = 0;
+	while (str[i])
+		i++;
+	ret = malloc(sizeof(char) * i + 1);
+	*ret[i] = 0;
+	return(ret);
 }
 
 char **process_path(char *str, char **ag)
 {
 	int i;
-	char *ret;
 	char **fpath;
 	char **temp;
 	char *suffix;
+	char *cmd;
 
-	suffix = ft_strjoin("/", find_cmd(ag[2]));
-	str = ft_strchr(str, '/');
-	temp = ft_split(str, ':');
+	cmd = find_cmd(ag[2]);
+	suffix = ft_strjoin("/", cmd);
+	free(cmd);
+	temp = ft_split(ft_strchr(str, '/'), ':');
 	i = 0;
+	fpath = assign_array(temp);
 	while(temp[i])
 	{
-		fpath[i] = ft_strjoin(temp[i], suffix);
+		fpath[i] = ft_strdup(ft_strjoin(temp[i], suffix));
 		free(temp[i]);
 		i++;
 	}
+	free(temp);
 	free(suffix);
 	return (fpath);
 }

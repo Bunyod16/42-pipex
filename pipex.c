@@ -3,17 +3,28 @@
 #include <sys/wait.h>
 #include "pipex.h"
 
-// void		free_pp(char **str)
-// {
-// 	free(str);
-// }
+void		free_pp(char **str)
+{
+	unsigned int i;
+
+	i = 0;
+	while (str[i] && *str[i])
+	{
+	    if (*str[i] == '/')
+	        free(str[i]);
+		i++;
+	}
+}
 
 static void child_call(int fd1, char **ag, char **envp, int fd[2], char **path)
 {
 	const char **argv = (const char **) ft_split(ag[2], ' ');
 	int i;
-	int ffd;
-
+	
+	i = 0;
+	while(!ft_strnstr(envp[i] ,"PATH", 4))
+		i++;
+	path = process_path(envp[i], ag);
 	dup2(fd[1], 1);
 	dup2(fd1, 0);
 	close(fd[0]);
@@ -24,6 +35,8 @@ static void child_call(int fd1, char **ag, char **envp, int fd[2], char **path)
 		execve(path[i], (char **) argv, envp);
 		i++;
 	}
+	free_pp(path);
+	exit(0);
 }
 
 static void parent_call(int fd2, char **ag, char **ep, int fd[2])
@@ -31,9 +44,11 @@ static void parent_call(int fd2, char **ag, char **ep, int fd[2])
 	char *buf;
 
 	close(fd[1]);
-	read(fd[0], &buf, 10);
+	// read(fd[0], &buf, 10);
 	close(fd[0]);
-	write(fd2, "hello", 6);
+	// write(fd2, "hello", 6);
+	printf("im alive\n");
+	exit(0);
 }
 
 int pipex(int fd1, int fd2, char **argv, char **envp)
@@ -43,14 +58,8 @@ int pipex(int fd1, int fd2, char **argv, char **envp)
 	int		i;
 	char	**path;
 
-	i = 0;
-	while(!ft_strnstr(envp[i] ,"PATH", 4))
-		i++;
-	path = process_path(envp[i], argv);
 	pipe(pipe_end);
 	pid = fork();
-	close(pipe_end[1]);
-	close(pipe_end[0]);
 	if (pid == -1)
 		perror("Could not fork");
 	else if (pid == 0)
@@ -58,11 +67,8 @@ int pipex(int fd1, int fd2, char **argv, char **envp)
 	else if (pid > 0)
 		parent_call(fd2, argv ,envp, pipe_end);
 	i = 0;
-	while (path[i] && *path[i])
-	{
-		printf("%s\n", path[i]);
-		i++;
-	}
+	close(pipe_end[1]);
+	close(pipe_end[0]);
 }
 
 int main(int argc, char **argv, char **envp)
