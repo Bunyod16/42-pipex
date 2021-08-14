@@ -75,10 +75,10 @@ char **assign_array(char **str)
 	char **ret;
 
 	i = 0;
-	while (str[i])
+	while (str[i] != NULL)
 		i++;
-	ret = malloc(sizeof(char) * i + 1);
-	*ret[i] = 0;
+	ret = malloc(sizeof(char *) * i + 1);
+	ret[i] = 0;
 	return(ret);
 }
 

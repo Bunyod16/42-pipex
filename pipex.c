@@ -16,24 +16,32 @@ void		free_pp(char **str)
 	}
 }
 
-static void child_call(int fd1, char **ag, char **envp, int fd[2], char **path)
+static void child_call(int input_fd, char **ag, char **envp, int fd[2], char **path)
 {
-	const char **argv = (const char **) ft_split(ag[2], ' ');
+	char **argv; (const char **) ft_split(ag[2], ' ');
 	int i;
-	
+	char **dup_env;
+
+	argv = ft_split(ag[2], ' ');
 	i = 0;
 	while(!ft_strnstr(envp[i] ,"PATH", 4))
 		i++;
 	path = process_path(envp[i], ag);
-	dup2(fd[1], 1);
-	dup2(fd1, 0);
-	close(fd[0]);
-	close(fd[1]);
 	i = 0;
+	printf("%s\n",path[0]);
+	printf("%d\n",i);
 	while (path[i]);
 	{
-		execve(path[i], (char **) argv, envp);
-		i++;
+		printf("PRINTING %d\n",i);
+		printf("%s\n",path[i++]);
+	}
+	// dup2(fd[1], fileno(stdout));
+	// dup2(input_fd, fileno(stdin));
+	char *tda[4][10] = {"ls","-la",NULL};
+	i = -1;
+	while (path[++i]);
+	{
+		execve(path[i], *tda, envp);
 	}
 	free_pp(path);
 	exit(0);
@@ -41,13 +49,15 @@ static void child_call(int fd1, char **ag, char **envp, int fd[2], char **path)
 
 static void parent_call(int fd2, char **ag, char **ep, int fd[2])
 {
-	char *buf;
+	char buf[100];
+	// dup2(fd2, fileno(stdout));
+	// write(fd2, , 3);
 
-	close(fd[1]);
-	// read(fd[0], &buf, 10);
-	close(fd[0]);
-	// write(fd2, "hello", 6);
-	printf("im alive\n");
+	// wait(0);
+	// read(fd[0], buf, 10);
+	// write(fd2, buf, 10);
+	// close(fd[1]);
+	// close(fd[0]);
 	exit(0);
 }
 
@@ -64,9 +74,9 @@ int pipex(int fd1, int fd2, char **argv, char **envp)
 		perror("Could not fork");
 	else if (pid == 0)
     	child_call(fd1, argv, envp, pipe_end, path);
-	else if (pid > 0)
+	else
 		parent_call(fd2, argv ,envp, pipe_end);
-	i = 0;
+	printf("returned\n");
 	close(pipe_end[1]);
 	close(pipe_end[0]);
 }
