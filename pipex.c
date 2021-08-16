@@ -1,11 +1,22 @@
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bshamsid <bshamsid@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/16 13:12:18 by bshamsid          #+#    #+#             */
+/*   Updated: 2021/08/16 13:12:18 by bshamsid         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 #include <sys/wait.h>
 #include "pipex.h"
 
-void		free_pp(char **str)
+void	free_pp(char **str)
 {
-	unsigned int i;
+	unsigned int	i;
 
 	i = 0;
 	while (str[i] && *str[i])
@@ -16,7 +27,7 @@ void		free_pp(char **str)
 	free(str);
 }
 
-static void child_call(int input_fd, char **ag, char **envp, int fd[2])
+static void	child_call(int input_fd, char **ag, char **envp, int fd[2])
 {
 	char	**argv;
 	char	**path;
@@ -24,7 +35,7 @@ static void child_call(int input_fd, char **ag, char **envp, int fd[2])
 
 	argv = ft_split(ag[2], ' ');
 	i = 0;
-	while(!ft_strnstr(envp[i] ,"PATH", 4))
+	while (!ft_strnstr(envp[i], "PATH", 4))
 		i++;
 	path = process_path(envp[i], argv[0]);
 	close(fd[0]);
@@ -43,7 +54,7 @@ static void child_call(int input_fd, char **ag, char **envp, int fd[2])
 	exit(0);
 }
 
-static void child_call2(int output_fd, char **ag, char **envp, int fd[2])
+static void	child_call2(int output_fd, char **ag, char **envp, int fd[2])
 {
 	char	**argv;
 	char	**path;
@@ -51,7 +62,7 @@ static void child_call2(int output_fd, char **ag, char **envp, int fd[2])
 
 	argv = ft_split(ag[3], ' ');
 	i = 0;
-	while(!ft_strnstr(envp[i] ,"PATH", 4))
+	while (!ft_strnstr(envp[i], "PATH", 4))
 		i++;
 	close(fd[1]);
 	path = process_path(envp[i], argv[0]);
@@ -69,7 +80,7 @@ static void child_call2(int output_fd, char **ag, char **envp, int fd[2])
 	exit(0);
 }
 
-int pipex(int fd1, int fd2, char **argv, char **envp)
+int	pipex(int fd1, int fd2, char **argv, char **envp)
 {
 	pid_t	pid;
 	int		pipe_end[2];
@@ -79,33 +90,33 @@ int pipex(int fd1, int fd2, char **argv, char **envp)
 	if (pid == -1)
 		perror("Could not fork\n");
 	else if (pid == 0)
-    	child_call(fd1, argv, envp, pipe_end);
+		child_call(fd1, argv, envp, pipe_end);
 	pid = fork();
 	if (pid == -1)
 		perror("Could not fork\n");
 	else if (pid == 0)
-    	child_call2(fd2, argv, envp, pipe_end);
+		child_call2(fd2, argv, envp, pipe_end);
 	close(pipe_end[1]);
 	close(pipe_end[0]);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-    const int fd1 = open(argv[1], O_RDONLY);
-    const int fd2 = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, S_IRWXU);
-    
+	const int	fd1 = open(argv[1], O_RDONLY);
+	const int	fd2 = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, S_IRWXU);
+
 	if (argc != 5)
 	{
 		ft_putstr_fd("Need exactly 5 arguements!", 1);
 		return (-1);
 	}
-	if(check_acess(envp, argv) == 0)
+	if (check_acess(envp, argv) == 0)
 		return (-1);
-	if(!check_commands(envp, argv, get_fa(argv[2]))
+	if (!check_commands(envp, argv, get_fa(argv[2]))
 		|| !check_commands(envp, argv, get_fa(argv[3])))
 		return (-1);
 	if (fd1 < 0 || fd2 < 0)
-         perror("Error reading file");
-    pipex(fd1, fd2, argv, envp);
-    return (0);
+		perror("Error reading file");
+	pipex(fd1, fd2, argv, envp);
+	return (0);
 }

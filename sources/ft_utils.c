@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_utils.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/16 13:06:10 by marvin            #+#    #+#             */
+/*   Updated: 2021/08/16 13:06:10 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../pipex.h"
 #include <stdio.h>
 
@@ -49,17 +61,17 @@ void	ft_putstr_fd(char *s, int fd)
 	}	
 }
 
-int count_size(char **str)
+int	count_size(char **str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (str[i] != NULL)
 		i++;
-	return(i);
+	return (i);
 }
 
-char **process_path(char *str, char *ag)
+char	**process_path(char *str, char *ag)
 {
 	int		i;
 	char	**fpath;
@@ -71,7 +83,7 @@ char **process_path(char *str, char *ag)
 	fpath = malloc(sizeof(char *) * (count_size(temp) + 1));
 	i = 0;
 	fpath[count_size(temp)] = '\0';
-	while(temp[i])
+	while (temp[i])
 	{
 		fpath[i] = ft_strjoin(temp[i], suffix);
 		free(temp[i]);
