@@ -6,7 +6,7 @@
 /*   By: bshamsid <bshamsid@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/16 13:12:05 by bshamsid          #+#    #+#             */
-/*   Updated: 2021/08/16 13:12:05 by bshamsid         ###   ########.fr       */
+/*   Updated: 2021/08/16 15:22:54 by bshamsid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ char	**split_path(char **envp)
 	while (!ft_strnstr(envp[i], "PATH", 4))
 		i++;
 	ret = ft_split(envp[i] + 5, ':');
+	return (ret);
 }
 
 int	check_commands(char **envp, char **argv, char *cmd)

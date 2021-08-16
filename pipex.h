@@ -6,7 +6,7 @@
 /*   By: bshamsid <bshamsid@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/16 13:12:12 by bshamsid          #+#    #+#             */
-/*   Updated: 2021/08/16 13:12:12 by bshamsid         ###   ########.fr       */
+/*   Updated: 2021/08/16 15:18:46 by bshamsid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <errno.h>
 
 void	ft_putstr_fd(char *s, int fd);
 size_t	ft_strlen(const char *s);

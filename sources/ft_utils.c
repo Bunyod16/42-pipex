@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/16 13:06:10 by marvin            #+#    #+#             */
-/*   Updated: 2021/08/16 13:06:10 by marvin           ###   ########.fr       */
+/*   Updated: 2021/08/16 15:20:32 by bshamsid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ char	**process_path(char *str, char *ag)
 	temp = ft_split(ft_strchr(str, '/'), ':');
 	fpath = malloc(sizeof(char *) * (count_size(temp) + 1));
 	i = 0;
-	fpath[count_size(temp)] = '\0';
+	fpath[count_size(temp)] = 0;
 	while (temp[i])
 	{
 		fpath[i] = ft_strjoin(temp[i], suffix);

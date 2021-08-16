@@ -6,13 +6,14 @@
 /*   By: bshamsid <bshamsid@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/16 13:12:18 by bshamsid          #+#    #+#             */
-/*   Updated: 2021/08/16 13:12:18 by bshamsid         ###   ########.fr       */
+/*   Updated: 2021/08/17 01:45:48 by bshamsid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <sys/wait.h>
 #include "pipex.h"
+#include <stdio.h>
 
 void	free_pp(char **str)
 {
@@ -39,9 +40,9 @@ static void	child_call(int input_fd, char **ag, char **envp, int fd[2])
 		i++;
 	path = process_path(envp[i], argv[0]);
 	close(fd[0]);
-	dup2(fd[1], fileno(stdout));
+	dup2(fd[1], 1);
 	close(fd[1]);
-	dup2(input_fd, fileno(stdin));
+	dup2(input_fd, 0);
 	close(input_fd);
 	i = -1;
 	while (path[++i])
@@ -66,8 +67,8 @@ static void	child_call2(int output_fd, char **ag, char **envp, int fd[2])
 		i++;
 	close(fd[1]);
 	path = process_path(envp[i], argv[0]);
-	dup2(fd[0], fileno(stdin));
-	dup2(output_fd, fileno(stdout));
+	dup2(fd[0], 0);
+	dup2(output_fd, 1);
 	close(fd[0]);
 	i = -1;
 	while (path[++i])
@@ -80,7 +81,7 @@ static void	child_call2(int output_fd, char **ag, char **envp, int fd[2])
 	exit(0);
 }
 
-int	pipex(int fd1, int fd2, char **argv, char **envp)
+void	pipex(int fd1, int fd2, char **argv, char **envp)
 {
 	pid_t	pid;
 	int		pipe_end[2];
