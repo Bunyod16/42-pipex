@@ -10,10 +10,10 @@ void		free_pp(char **str)
 	i = 0;
 	while (str[i] && *str[i])
 	{
-	    if (*str[i] == '/')
-	        free(str[i]);
+		free(str[i]);
 		i++;
 	}
+	free(str);
 }
 
 static void child_call(int input_fd, char **ag, char **envp, int fd[2])
@@ -40,6 +40,7 @@ static void child_call(int input_fd, char **ag, char **envp, int fd[2])
 	}
 	free_pp(argv);
 	free(path);
+	exit(0);
 }
 
 static void child_call2(int output_fd, char **ag, char **envp, int fd[2])
@@ -58,7 +59,6 @@ static void child_call2(int output_fd, char **ag, char **envp, int fd[2])
 	dup2(output_fd, fileno(stdout));
 	close(fd[0]);
 	i = -1;
-	printf("PATH:%s\n",path[0]);
 	while (path[++i])
 	{
 		execve(path[i], argv, envp);
@@ -66,6 +66,7 @@ static void child_call2(int output_fd, char **ag, char **envp, int fd[2])
 	}
 	free_pp(argv);
 	free(path);
+	exit(0);
 }
 
 int pipex(int fd1, int fd2, char **argv, char **envp)
@@ -98,6 +99,11 @@ int main(int argc, char **argv, char **envp)
 		ft_putstr_fd("Need exactly 5 arguements!", 1);
 		return (-1);
 	}
+	if(check_acess(envp, argv) == 0)
+		return (-1);
+	if(!check_commands(envp, argv, get_fa(argv[2]))
+		|| !check_commands(envp, argv, get_fa(argv[3])))
+		return (-1);
 	if (fd1 < 0 || fd2 < 0)
          perror("Error reading file");
     pipex(fd1, fd2, argv, envp);
