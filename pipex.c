@@ -81,11 +81,15 @@ static void	child_call2(int output_fd, char **ag, char **envp, int fd[2])
 	exit(0);
 }
 
-void	pipex(int fd1, int fd2, char **argv, char **envp)
+void	pipex(char **argv, char **envp)
 {
-	pid_t	pid;
-	int		pipe_end[2];
+	pid_t		pid;
+	int			pipe_end[2];
+	const int	fd1 = open(argv[1], O_RDONLY);
+	const int	fd2 = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, S_IRWXU);
 
+	if (fd1 < 0 || fd2 < 0)
+		perror("Error reading file");
 	pipe(pipe_end);
 	pid = fork();
 	if (pid == -1)
@@ -103,12 +107,9 @@ void	pipex(int fd1, int fd2, char **argv, char **envp)
 
 int	main(int argc, char **argv, char **envp)
 {
-	const int	fd1 = open(argv[1], O_RDONLY);
-	const int	fd2 = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, S_IRWXU);
-
 	if (argc != 5)
 	{
-		ft_putstr_fd("Need exactly 5 arguements!", 1);
+		ft_putstr_fd("Need exactly 5 arguements!\n", 1);
 		return (-1);
 	}
 	if (check_acess(envp, argv) == 0)
@@ -116,8 +117,6 @@ int	main(int argc, char **argv, char **envp)
 	if (!check_commands(envp, argv, get_fa(argv[2]))
 		|| !check_commands(envp, argv, get_fa(argv[3])))
 		return (-1);
-	if (fd1 < 0 || fd2 < 0)
-		perror("Error reading file");
-	pipex(fd1, fd2, argv, envp);
+	pipex(argv, envp);
 	return (0);
 }
